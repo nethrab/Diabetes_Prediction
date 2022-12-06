@@ -1,0 +1,45 @@
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler #standardize the data
+from sklearn.model_selection import train_test_split #spliting data to train the model and test the model
+from sklearn import svm #support vector machine
+from sklearn.metrics import accuracy_score
+#Data collection
+diabetes_data = pd.read_csv('/content/diabetes.csv') #path by copying path address afer uploading the file to googlecolab
+diabetes_data.head() #to understand to the rows and columns available
+diabetes_data.shape #no. of rows and columns available
+diabetes_data.describe() # to get mean, median, mode and other stat values for data cleaning
+diabetes_data['Outcome'].value_counts() #to get the number of patients who have diabetes ( 0 - Non diabetic, 1- diabetic)
+diabetes_data.groupby('Outcome').mean() #getting mean value of all the columns based outcome label
+#separating data
+A = diabetes_data.drop(columns='Outcome', axis =1) #Dropping outcome alone, axis = 1, for dropping a column entirely
+B = diabetes_data['Outcome']
+# Data Preprocessing and standardisation
+scaler = StandardScaler()
+scaler.fit(A)
+standardized_data = scaler.transform(A)
+A = standardized_data
+# Splitting data for training the model and testing the model
+A_train, A_test, B_train, B_test = train_test_split(A,B, test_size = 0.2, stratify=B, random_state=2)
+# A and B is split into train and test,to test the accuracy of the model. Test_size shows the percentage allocated for testing based on B's values
+classifier = svm.SVC(kernel='linear')
+classifier.fit(A_train, B_train)
+# accuracy score on the training data
+A_train_prediction = classifier.predict(A_train)
+training_data_accuracy = accuracy_score(A_train_prediction, B_train)
+#print('Accuracy score of the training data : ', training_data_accuracy)
+___________________________________________________________________
+input_data = (5,106,72,19,60,25.8,0.587,21) #Change values here to try prediction
+# changing the input_data to numpy array
+input_data_as_numpy_array = np.asarray(input_data)
+# reshape the array as we are predicting for one instance
+input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
+# standardize the input data
+std_data = scaler.transform(input_data_reshaped)
+print(std_data)
+prediction = classifier.predict(std_data)
+print(prediction)
+if (prediction[0] == 0):
+  print('The person is not diabetic')
+else:
+  print('The person is diabetic')
